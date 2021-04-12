@@ -42,14 +42,14 @@ public class ContactServiceImpl implements ContactRepository, PagingAndSortingRe
 	@Override
 	public Contact getContactById(String id) {
 		Query q = new Query();
-		q.addCriteria(new Criteria().where("_id").is(id));
+		q.addCriteria(Criteria.where("_id").is(id));
 		return mongoTemplate.findOne(q, Contact.class);
 	}
 
 	@Override
 	public Contact updateContact(Contact contact) {
 		Query query = new Query();
-		query.addCriteria(new Criteria().where("_id").is(contact.getId()));
+		query.addCriteria(Criteria.where("_id").is(contact.getId()));
 		Contact c = mongoTemplate.findOne(query, Contact.class);
 		if(c != null) {
 			mongoTemplate.save(contact);
@@ -63,7 +63,7 @@ public class ContactServiceImpl implements ContactRepository, PagingAndSortingRe
 	public long deleteContact(String id) {
 		Query query = new Query();
 		
-		query.addCriteria(new Criteria().where("_id").is(id));
+		query.addCriteria(Criteria.where("_id").is(id));
 		Contact c = mongoTemplate.findOne(query, Contact.class);
 		if(c != null) {
 			
@@ -97,7 +97,7 @@ public class ContactServiceImpl implements ContactRepository, PagingAndSortingRe
 	@Override
 	public Contact updateContactById(String id, String file) {
 		Query query = new Query();
-		query.addCriteria(new Criteria().where("_id").is(id));
+		query.addCriteria(Criteria.where("_id").is(id));
 		Contact c = mongoTemplate.findOne(query, Contact.class);
 		if(c != null) {
 			c.setFile(file);

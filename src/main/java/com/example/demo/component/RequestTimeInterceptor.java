@@ -1,7 +1,5 @@
 package com.example.demo.component;
 
-import java.time.LocalDateTime;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,8 +24,8 @@ public class RequestTimeInterceptor extends HandlerInterceptorAdapter{
 	
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
-		long startTime = (long) request.getAttribute("startTime");
 		
+		long startTime = (long) request.getAttribute("startTime");
 		String username = "";
 		String url = request.getRequestURL().toString();
 		
@@ -40,7 +38,7 @@ public class RequestTimeInterceptor extends HandlerInterceptorAdapter{
 		//com.example.demo.entity.Log log = new com.example.demo.entity.Log(LocalDateTime.now().toString(), auth.getDetails().toString(), username, url);
 		//Guardamos en log las acciones del usuario
 		//logRepository.saveLog(log);
-		logg.info("Request Url : " + request.getRequestURL().toString() + "Tiempo total respuesta : " + (System.currentTimeMillis() - startTime) + " ms");
+		logg.info("Request Url : " + request.getRequestURL().toString() + "Tiempo total de respuesta : " + (System.currentTimeMillis() - startTime) + " ms");
 	}
 	
 	

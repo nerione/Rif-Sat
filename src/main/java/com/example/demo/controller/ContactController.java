@@ -24,15 +24,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.MediaType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import com.example.demo.converter.ContactConverter;
 import com.example.demo.entity.Contact;
+import com.example.demo.model.AuthTokenResponse;
 import com.example.demo.model.ContactModel;
 import com.example.demo.repository.ContactRepository;
+import com.example.demo.service.SMS;
 import com.example.demo.service.UploadImagenService;
+import com.example.demo.utils.Utilities;
 
 //Para despliegues en ambientes productivos, es necesario agregar a la linea de abajo, el dominio, ruta o ip donde se encuentre desplegado el front. 
 //El * indica que acepte peticiones de donde sea. Por ahora esta bien pero no es recomendable
@@ -52,7 +56,11 @@ public class ContactController {
 	@Autowired
 	private ContactConverter contactConverter;
 	
+	@Autowired
+	private SMS smsService;
+	
 	private static final Integer TAM_PAGINA = 3;
+	
 	
 	//API PARA OPERACIONES BASICAS SOBRE UN CONTACTO
 	
@@ -119,6 +127,36 @@ public class ContactController {
 			
 			return response;
 
+		}
+		
+		//Servicio para el envio de codigo verificador por sms al usuario registrado
+		@GetMapping(path="/sms", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+		public ResponseEntity<String> getToken(@RequestParam(name = "telefono") String telefono) {
+			
+			String response = null;
+			HttpHeaders httpHeaders = new HttpHeaders();
+			httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+			
+			try {
+				log.info("Iniciando peticion de envio de token via SMS");
+				//Recuperamos un token
+				ResponseEntity<AuthTokenResponse> tokenRequest = smsService.getToken();
+				if(tokenRequest.getBody() != null && tokenRequest.getBody().getCode().equalsIgnoreCase("auth_02")) {
+					//enviamo OTP
+					response = smsService.sendOTP(tokenRequest.getBody().getToken(), Utilities.generateOTP(),telefono);
+					
+				}else {
+					throw new Exception("No se pudo obtener un token para envio de otp");
+				}
+				
+				
+			}catch (Exception e) {
+				log.error("Error al intentar enviar codigo OTP al usuario " + e.getMessage());
+			}
+			
+			
+			return new ResponseEntity<String>(null, httpHeaders, HttpStatus.OK);		
+						
 		}
 		
 		
